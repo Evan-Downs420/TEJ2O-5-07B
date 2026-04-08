@@ -5,53 +5,39 @@
  * This program control the servo
 */
 
-// variable
+// variables
 let distance = 0
-const strip = neopixel.create(DigitalPin.P16, 4, NeoPixelMode.RGB)
-
-
-// clear setup
-strip.clear()
-strip.show()
-
-
-basic.showIcon(IconNames.Happy)
-
-
-// press a
-input.onButtonPressed(Button.A, function () {
-
-    distance = sonar.ping(DigitalPin.P8, DigitalPin.P12, PingUnit.Centimeters)
-
-
-    if (distance < 10) {
-        strip.showColor(neopixel.colors(NeoPixelColors.Red))
-    } else {
-        strip.showColor(neopixel.colors(NeoPixelColors.Green))
-    }
-    strip.show()
-    basic.showNumber(distance)
-})
 
 // setup
 basic.showIcon(IconNames.Happy)
 
-// loop forever
-while (true) {
-    if (input.buttonIsPressed(Button.A) == true) {
-        // turn the motor 180 degrees
-        basic.showIcon(IconNames.Yes)
-        robotbit.StepperTurn(robotbit.Steppers.M1, robotbit.Turns.T1B0)
-        basic.showIcon(IconNames.Happy)
-    }
+// button a
+input.onButtonPressed(Button.A, function () {
+    while (true) {
 
-    if (input.buttonIsPressed(Button.B) == true) {
-        // move car forwards and backwards
-        basic.showIcon(IconNames.Yes)
-        robotbit.StpCarMove(10, 48)
-        basic.pause(500)
-        robotbit.StpCarMove(-10, 48)
-        basic.showIcon(IconNames.Happy)
-    }
-}
+        // read distance sensor
+        distance = sonar.ping(
+            DigitalPin.P8,
+            DigitalPin.P12,
+            PingUnit.Centimeters
+        )
 
+        if (distance < 10) {
+            robotbit.StpCarMove(0, 0)
+            basic.pause(500)
+
+            // reverse 10 cm
+            robotbit.StpCarMove(-10, 48)
+            basic.pause(1000)
+
+
+            //turn 90 degrees
+            robotbit.StpCarTurn(90, 48, 125)
+            basic.pause(1000)
+
+        } else {
+            // Otherwise move forward
+            robotbit.StpCarMove(10, 48)
+        }
+    }
+})
